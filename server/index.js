@@ -24,7 +24,7 @@ function isLoggedIn (req, res, next) {
         let result = utils.verifyToken(req.headers.authorization);
 
         if (result) {
-            currentUser = result.username;
+            currentUser = result.userName;
             next();
         }
         else
@@ -39,33 +39,10 @@ app.get('/', isLoggedIn, function(req, res){
 })
 
 
-
-app.post('/login', (req, res) => {
-
-    let record = users.find((user) => {
-        return user.username === req.body.username && user.password === req.body.password;
-    })
-
-    if (record) {
-        var details = {
-            username: record.username
-        };
-    
-        let token = utils.generateToken(details);
-        
-        res.status(200).json({token:token, error:0, message:"Login successful"});
-    }
-
-    else {
-        res.json({token: "", error: 1, message: "Wrong Credentials"});
-    }
-})
-
-
 app.post('/signUp', (req, res) => {
 
     let record = users.find((user) => {
-        return user.username === req.body.username;
+        return user.userName === req.body.userName;
     })
 
     if (record) {
@@ -78,14 +55,35 @@ app.post('/signUp', (req, res) => {
         console.log(users);
         
         var details = {
-            username: req.body.username
+            userName: req.body.userName
         };
     
         let token = utils.generateToken(details);
     
         res.status(201).json({token: token, error: 0, message: "Account created."});
     }
+})
 
+
+app.post('/login', (req, res) => {
+
+    let record = users.find((user) => {
+        return user.userName === req.body.userName && user.password === req.body.password;
+    })
+
+    if (record) {
+        var details = {
+            userName: record.userName
+        };
+    
+        let token = utils.generateToken(details);
+        
+        res.status(200).json({token:token, error:0, message:"Login successful"});
+    }
+
+    else {
+        res.json({token: "", error: 1, message: "Wrong Credentials"});
+    }
 })
 
 // For checking current data
