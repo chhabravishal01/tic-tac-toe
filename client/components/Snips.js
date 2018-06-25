@@ -1,3 +1,7 @@
+// <Row id='0' clicked={this.clicked} symbolSize= {size} symbols= {this.state.symbols} />
+// <Row id='1' clicked={this.clicked} symbolSize= {size} symbols= {this.state.symbols} />
+// <Row id='2' clicked={this.clicked} symbolSize= {size} symbols= {this.state.symbols} />
+
 // <View style={styles.row}>
 //     <Cell id='0' clicked={this.clicked} style={[styles.cell, styles.cellOdd]} symbolSize= {size} symbol= {this.state.symbols[0]} />
 //     <Cell id='1' clicked={this.clicked} style={[styles.cell,]} symbolSize= {size} symbol= {this.state.symbols[1]} />

@@ -43,7 +43,6 @@ const styles = StyleSheet.create({
 
     infoSection : {
         flex : 4,
-        // paddingTop : 100,
         justifyContent : 'center',
         alignItems : 'center',
     },
