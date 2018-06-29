@@ -1,80 +1,97 @@
-import { StyleSheet } from 'react-native';
+import { StyleSheet } from "react-native";
 
 const styles = StyleSheet.create({
-    container: {
-      backgroundColor: '#ddd',
-      flex : 1,
-    },
+  container: {
+    backgroundColor: "#ddd",
+    alignItems: "center",
+    flex: 1
+  },
 
-    topBar: {
-        flexDirection: 'row',
-        justifyContent: "space-between",
-        // flex-start, center, flex-end, space-around, space-between and space-evenly
+  topBar: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    // flex-start, center, flex-end, space-around, space-between and space-evenly
 
-        alignItems: 'flex-end',
-        // flex-start, center, flex-end, and stretch.
+    alignItems: "flex-end",
+    // flex-start, center, flex-end, and stretch.
 
-        backgroundColor: "#aaa",
-        // borderRadius : 5,
-        paddingBottom : 10,
+    backgroundColor: "#aaa",
+    // borderRadius : 5,
+    paddingBottom: 10,
 
-        // alignSelf: 'stretch',
-        // auto, flex-start, flex-end, center, stretch, baseline
-        flex : 1,
-    },
+    alignSelf: "stretch",
+    // auto, flex-start, flex-end, center, stretch, baseline
+    flex: 1
+  },
 
-    user : {
-        paddingLeft : 30,
-        fontSize : 25,
-    },
+  user: {
+    paddingLeft: 30,
+    fontSize: 25
+  },
 
-    logout: {
-        color: 'blue',
-        paddingRight : 30,
-        fontSize: 20,
-    },
+  logout: {
+    color: "blue",
+    paddingRight: 30,
+    fontSize: 20
+  },
 
-    board : {
-        flex: 5,
-        // backgroundColor: 'blue',
-        margin : 20,
-        marginTop : 50,
-    },
+  input: {
+    margin: 10,
+    width: 250,
+    fontSize: 20,
+    padding: 10,
+    borderRadius: 10,
+    backgroundColor: "#eee"
+    //   borderWidth: 1,
+  },
 
-    infoSection : {
-        flex : 4,
-        justifyContent : 'center',
-        alignItems : 'center',
-    },
+  board: {
+    flex: 5,
+    justifyContent: "center",
+    alignItems: "center",
+    // backgroundColor: 'blue',
+    // margin : 20,
+    // padding : 10,
+    marginTop: 50,
+    aspectRatio: 1
+  },
 
-    row : {
-        flexDirection : 'row',
-        flex : 1,
-    },
+  line: {
+    backgroundColor: "black",
+    position: "absolute"
+  },
 
-    // cell : {
-    //     flex : 1,
-    //     justifyContent : 'center',
-    //     alignItems : 'center',
-    // },
+  infoSection: {
+    flex: 4,
+    justifyContent: "center",
+    alignItems: "center"
+  },
 
-    cellOdd : {
-        flex : 1,
-        justifyContent : 'center',
-        alignItems : 'center',
-        backgroundColor : '#eee',
-    },
+  row: {
+    flexDirection: "row",
+    aspectRatio: 3
+    // flex : 1,
+  },
 
-    cellEven : {
-        flex : 1,
-        justifyContent : 'center',
-        alignItems : 'center',
-    },
+  cellOdd: {
+    // flex : 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#eee",
+    aspectRatio: 1
+  },
 
-    error: {
-        marginTop: 10,
-        color: 'red',
-    }
-  });
+  cellEven: {
+    // flex : 1,
+    justifyContent: "center",
+    alignItems: "center",
+    aspectRatio: 1
+  },
 
-  export default styles;
+  error: {
+    marginTop: 10,
+    color: "red"
+  }
+});
+
+export default styles;
