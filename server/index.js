@@ -15,6 +15,16 @@ io.on("connection", client => {
     socketIdList[data.userName] = client.id;
   });
 
+  client.on("leaveRoom", data => {
+    client.leave(data.roomId);
+    io.in(data.roomId).emit("leaveRoom");
+    io.in(data.roomId).clients((err, clients) => {
+      clients.forEach(client => {
+        io.sockets.sockets[client].leave(data.roomId);
+      });
+    });
+  });
+
   // client.on("disconnect", data => {
   //   delete socketIdList[data.userName];
   //   console.log("disconnected");
@@ -113,7 +123,7 @@ app.post("/signUp", (req, res) => {
     res.json({
       token: "",
       error: 1,
-      message: "Username already exists. Choose another username."
+      message: "Username already exists."
     });
   } else {
     users.push(req.body);
