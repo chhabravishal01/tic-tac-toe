@@ -12,9 +12,11 @@ const Utils = {
         "Content-Type": "application/json"
       },
       body: JSON.stringify({ userName: userName, password: password })
-    }).then(res => {
-      return res.json();
-    });
+    })
+      .then(res => {
+        return res.json();
+      })
+      .catch(() => alert("Can't connect with server"));
   },
 
   login: (userName, password) => {
@@ -25,9 +27,11 @@ const Utils = {
         "Content-Type": "application/json"
       },
       body: JSON.stringify({ userName: userName, password: password })
-    }).then(res => {
-      return res.json();
-    });
+    })
+      .then(res => {
+        return res.json();
+      })
+      .catch(() => alert("Can't connect with server"));
   },
 
   setToken: token => {
