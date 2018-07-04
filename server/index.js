@@ -50,7 +50,7 @@ io.on("connection", client => {
       client.emit("acknowledgement", { message: "Invitation sent", error: 0 });
     } else {
       client.emit("acknowledgement", {
-        message: "Username doesn't exists.",
+        message: "Username doesn't exist.",
         error: 1
       });
     }
@@ -162,7 +162,7 @@ app.post("/login", (req, res) => {
       .status(200)
       .json({ token: token, error: 0, message: "Login successful" });
   } else {
-    res.json({ token: "", error: 1, message: "Wrong Credentials" });
+    res.json({ token: "", error: 1, message: "Invalid Credentials" });
   }
 });
 

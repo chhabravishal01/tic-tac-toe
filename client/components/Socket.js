@@ -31,6 +31,10 @@ const Socket = {
     socket.on("inviteResponse", data => {
       cb("inviteResponse", data);
     });
+
+    socket.on("leaveRoom", data => {
+      cb("leaveRoom", data);
+    });
   },
 
   sendData: (channel, data) => {

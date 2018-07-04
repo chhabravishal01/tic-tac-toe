@@ -24,3 +24,43 @@
 //   //   console.log("middleware:", handshakeData._query["userName"]);
 //   console.log("connected auto");
 // });
+
+// ------Board.js-----------------
+// let dLineOneAngle = dLineAngle.interpolate({
+//     inputRange: [0, 45],
+//     outputRange: ["0deg", "-45deg"]
+//   });
+//   let dLineTwoAngle = dLineAngle.interpolate({
+//     inputRange: [0, 45],
+//     outputRange: ["0deg", "45deg"]
+//   });
+
+// -----Grid.js-------------------
+
+{
+  /* Diagonal line 1 */
+}
+// <Animated.View
+// style={[
+//   {
+//     left: this.props.dLinePosition,
+//     height: this.props.dLineOneHeight,
+//     width: 2,
+//     transform: [{ rotate: this.props.dLineOneAngle }]
+//   },
+//   styles.line
+// ]}
+// />
+
+// {/* Diagonal line 2 */}
+// <Animated.View
+// style={[
+//   {
+//     left: this.props.dLinePosition,
+//     height: this.props.dLineTwoHeight,
+//     width: 2,
+//     transform: [{ rotate: this.props.dLineTwoAngle }]
+//   },
+//   styles.line
+// ]}
+// />

@@ -1,23 +1,29 @@
 import { StyleSheet } from "react-native";
 
+export const baseColor = "#27AADE";
+export const materialRed = "#E53935";
 const styles = StyleSheet.create({
   container: {
     backgroundColor: "#ddd",
+    backgroundColor: "#27AADE11",
     alignItems: "center",
     flex: 1
   },
 
   topBar: {
-    flexDirection: "row",
-    justifyContent: "space-between",
+    // flexDirection: "row",
+    // justifyContent: "space-between",
     // flex-start, center, flex-end, space-around, space-between and space-evenly
 
-    alignItems: "flex-end",
+    // alignItems: "flex-end",
     // flex-start, center, flex-end, and stretch.
 
-    backgroundColor: "#aaa",
+    // backgroundColor: "#aaa",
+    backgroundColor: baseColor,
     // borderRadius : 5,
-    paddingBottom: 10,
+    // borderWidth: 1,
+    // paddingBottom: 10,
+    marginBottom: 20,
 
     alignSelf: "stretch",
     // auto, flex-start, flex-end, center, stretch, baseline
@@ -25,13 +31,14 @@ const styles = StyleSheet.create({
   },
 
   user: {
-    paddingLeft: 30,
+    paddingLeft: 10,
     fontSize: 25
+    // color: "white"
   },
 
   logout: {
     color: "blue",
-    paddingRight: 30,
+    // paddingRight: 30,
     fontSize: 20
   },
 
@@ -77,7 +84,9 @@ const styles = StyleSheet.create({
     // flex : 1,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "#eee",
+    // backgroundColor: "#eee",
+    // backgroundColor: "#27AADE55",
+    backgroundColor: "#77777733",
     aspectRatio: 1
   },
 
@@ -85,7 +94,9 @@ const styles = StyleSheet.create({
     // flex : 1,
     justifyContent: "center",
     alignItems: "center",
-    aspectRatio: 1
+    aspectRatio: 1,
+    backgroundColor: "white"
+    // backgroundColor: "#777777"
   },
 
   error: {

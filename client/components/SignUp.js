@@ -2,12 +2,19 @@ import React, { Component } from "react";
 import {
   StyleSheet,
   Text,
-  TextInput,
   View,
-  TouchableOpacity
+  TouchableOpacity,
+  Dimensions,
+  Image,
+  LayoutAnimation
 } from "react-native";
 
+import { Item, Input, Button, Icon } from "native-base";
+
+const { height } = Dimensions.get("screen");
+
 import Utils from "./Utils.js";
+import { baseColor, materialRed } from "./Styles.js";
 
 class SignUp extends Component {
   constructor(props) {
@@ -24,6 +31,7 @@ class SignUp extends Component {
   }
 
   signUp() {
+    LayoutAnimation.configureNext(LayoutAnimation.Presets.linear);
     if (this.state.userName === "") {
       this.setState({ error: "User Name is required" });
       return;
@@ -47,57 +55,68 @@ class SignUp extends Component {
 
   render() {
     return (
-      <View style={{ alignItems: "center" }}>
-        <View style={styles.container}>
-          <Text style={styles.header}>SignUp</Text>
+      <View style={styles.container}>
+        <Button
+          style={{ top: 40, position: "absolute" }}
+          transparent
+          onPress={() => {
+            this.props.changeView("login");
+          }}
+        >
+          <Icon name="arrow-back" style={{ fontSize: 30, color: "white" }} />
+        </Button>
 
-          <View style={styles.credentialsContainer}>
-            <TextInput
-              style={styles.input}
+        <View style={styles.icon}>
+          <Image source={require("../resources/icon.png")} />
+        </View>
+
+        <View style={styles.credentialsContainer}>
+          <Item rounded style={styles.input}>
+            <Input
+              underlineColorAndroid="transparent"
               autoCorrect={false}
               autoCapitalize="none"
               placeholder="User Name"
               placeholderTextColor="#999"
               onChangeText={value => this.setState({ userName: value })}
             />
-            <TextInput
-              style={styles.input}
+          </Item>
+
+          <Item rounded style={styles.input}>
+            <Input
               secureTextEntry={true}
+              underlineColorAndroid="transparent"
               autoCorrect={false}
               autoCapitalize="none"
               placeholder="Password"
               placeholderTextColor="#999"
               onChangeText={value => this.setState({ password: value })}
             />
-            <TextInput
-              style={styles.input}
+          </Item>
+          <Item floatingLabel rounded style={styles.input}>
+            <Input
               secureTextEntry={true}
+              underlineColorAndroid="transparent"
               autoCorrect={false}
               autoCapitalize="none"
-              placeholder="Reenter Password"
+              placeholder="Verify Password"
               placeholderTextColor="#999"
               onChangeText={value => this.setState({ verifyPassword: value })}
             />
-          </View>
-
-          <View style={styles.actions}>
-            <TouchableOpacity style={styles.button} onPress={this.signUp}>
-              <Text style={{ color: "blue" }}> SignUp </Text>
-            </TouchableOpacity>
-            <Text style={styles.error}> {this.state.error} </Text>
-          </View>
+          </Item>
         </View>
 
-        <View style={{}}>
-          <TouchableOpacity
-            style={styles.button}
-            onPress={() => {
-              this.props.changeView("login");
-            }}
-          >
-            <Text style={{ color: "blue" }}> Login </Text>
-          </TouchableOpacity>
-        </View>
+        {this.state.error.length > 0 && (
+          <View style={styles.errorBox}>
+            <Text style={styles.error}>
+              ERROR: {this.state.error.toUpperCase()}
+            </Text>
+          </View>
+        )}
+
+        <TouchableOpacity style={styles.button} onPress={this.signUp}>
+          <Text style={{ color: baseColor, fontSize: 20 }}> SignUp </Text>
+        </TouchableOpacity>
       </View>
     );
   }
@@ -110,52 +129,79 @@ const styles = StyleSheet.create({
     flexDirection: "column",
     justifyContent: "center",
     alignItems: "center",
-    paddingTop: 70,
-    //   backgroundColor: '#eee',
-    // height: 650,
-    flex: -1
+    backgroundColor: baseColor,
+    height
   },
 
-  actions: {
-    alignItems: "center"
+  icon: {
+    margin: 80,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0.1,
+    shadowRadius: 6,
+    elevation: 12,
+    height: 128,
+    width: 128,
+    borderRadius: 64
   },
 
   credentialsContainer: {
-    width: 300,
     alignItems: "center",
-    borderWidth: 1,
+    alignSelf: "stretch",
     borderColor: "grey",
-    borderRadius: 20,
-    padding: 30
-  },
-
-  header: {
-    fontSize: 30,
-    marginBottom: 30
+    paddingHorizontal: 16
   },
 
   input: {
-    margin: 10,
-    width: 250,
-    fontSize: 20,
-    padding: 10,
-    borderRadius: 10,
-    backgroundColor: "#eee"
-    //   borderWidth: 1,
+    marginVertical: 10,
+    height: 45,
+    paddingHorizontal: 15,
+    alignSelf: "stretch",
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "white",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0.1,
+    shadowRadius: 6,
+    elevation: 12
   },
 
+  label: { marginLeft: 30, marginTop: 3, fontSize: 16 },
+
   button: {
-    width: 300,
-    borderWidth: 1,
-    borderColor: "blue",
-    borderRadius: 10,
+    height: 40,
+    alignSelf: "stretch",
+    backgroundColor: "white",
+    borderRadius: 20,
     alignItems: "center",
-    margin: 30,
-    padding: 10
+    margin: 16,
+    justifyContent: "center",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0.1,
+    shadowRadius: 6,
+    elevation: 12
+  },
+
+  errorBox: {
+    height: 40,
+    alignSelf: "stretch",
+    alignItems: "center",
+    justifyContent: "center",
+    // backgroundColor: materialRed,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0.1,
+    shadowRadius: 6,
+    elevation: 12,
+    borderWidth: 0.5,
+    borderColor: "#fff"
   },
 
   error: {
-    marginTop: 10,
-    color: "red"
+    // color: "#fff",
+    color: materialRed,
+    letterSpacing: 2
   }
 });

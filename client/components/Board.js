@@ -1,56 +1,50 @@
 import React, { Component } from "react";
-import {
-  Text,
-  TextInput,
-  View,
-  Animated,
-  TouchableOpacity,
-  LayoutAnimation,
-  Alert
-} from "react-native";
+import { View, Animated, LayoutAnimation, Alert } from "react-native";
 
-import Utils from "./Utils.js";
-import Socket from "./Socket.js";
+import Utils from "./Utils";
+import Socket from "./Socket";
 
-import styles from "./Styles.js";
+import styles from "./Styles";
 
-import Topbar from "./Topbar.js";
-import Row from "./Row.js";
+import Topbar from "./Topbar";
+import InviteSection from "./InviteSection";
+import Grid from "./Grid";
+import InfoSection from "./InfoSection";
 
 class Board extends Component {
   constructor(props) {
     super(props);
 
     this.state = {
-      userDetails: "",
       userName: "-",
+
       symbols: Array(9).fill(""),
       symbolSize: new Animated.Value(90),
       nextSymbol: "X",
-      symbolAssigned: "",
-      onlineGameInfo: "",
       infoLabel: "Next Move :  ",
       infoSize: new Animated.Value(25),
+      // gridKey: 1,
 
       currentMode: "Offline",
-      inviteView: "none",
+      inviteViewHeight: 0,
       opponent: "",
+      symbolAssigned: "",
       inviteStatus: "",
+      roomId: "",
 
       occupiedCells: 0,
       gameEnd: false,
       boardOpacity: new Animated.Value(1),
 
-      hLineWidth: new Animated.Value(0),
+      hLineLength: new Animated.Value(0),
       hLinePosition: new Animated.Value(0),
 
-      vLineHeight: new Animated.Value(0),
+      vLineLength: new Animated.Value(0),
       vLinePosition: new Animated.Value(0),
 
-      dLineOneHeight: new Animated.Value(0),
-      dLineTwoHeight: new Animated.Value(0),
+      dLineOneLength: new Animated.Value(0),
+      dLineTwoLength: new Animated.Value(0),
 
-      dLinePosition: new Animated.Value(0),
       dLineAngle: new Animated.Value(0),
 
       viewW: 0,
@@ -67,11 +61,6 @@ class Board extends Component {
       [0, 4, 8],
       [2, 4, 6]
     ];
-
-    this.clicked = this.clicked.bind(this);
-    this.gameEnd = this.gameEnd.bind(this);
-    this.inviteDialog = this.inviteDialog.bind(this);
-    this.updateFromServer = this.updateFromServer.bind(this);
   }
 
   componentDidMount() {
@@ -85,15 +74,86 @@ class Board extends Component {
     });
   }
 
-  inviteDialog(inviteView = null) {
-    inviteView =
-      inviteView || this.state.inviteView === "flex" ? "none" : "flex";
+  leaveRoom = () => {
+    Socket.sendData("leaveRoom", { roomId: this.state.roomId });
+  };
+
+  reloadForOnlineGame = () => {
+    this.setState({
+      symbols: Array(9).fill(""),
+      nextSymbol: "X",
+      // gridKey: 1,
+      currentMode: "Online",
+      inviteViewHeight: 0,
+      inviteStatus: "",
+      occupiedCells: 0,
+      gameEnd: false
+    });
 
     LayoutAnimation.configureNext(LayoutAnimation.Presets.linear);
-    this.setState({ inviteView });
-  }
 
-  sendInvite() {
+    this.state.infoSize.setValue(25);
+    this.state.boardOpacity.setValue(1);
+    this.state.hLineLength.setValue(0);
+    this.state.vLineLength.setValue(0);
+    this.state.dLineOneLength.setValue(0);
+    this.state.dLineTwoLength.setValue(0);
+
+    this.state.hLinePosition.setValue(this.state.viewH / 2);
+    this.state.vLinePosition.setValue(this.state.viewW / 2);
+    Animated.timing(this.state.dLineAngle, {
+      toValue: 0
+    }).start();
+  };
+
+  reload = (proceed = false) => {
+    // gridKey = (this.state.gridKey + 1) % 2;
+    // this.setState({ gridKey });
+
+    if (
+      this.state.currentMode === "Online" &&
+      !this.state.gameEnd &&
+      !proceed
+    ) {
+      Alert.alert("Game in progress ", "Leave & refresh", [
+        {
+          text: "OK",
+          onPress: () => {
+            this.leaveRoom();
+            this.reload(true);
+          }
+        },
+        {
+          text: "Cancel"
+        }
+      ]);
+      return;
+    }
+
+    this.reloadForOnlineGame();
+
+    this.setState({
+      infoLabel: "Next Move :  ",
+      currentMode: "Offline",
+      symbolAssigned: "",
+      roomId: "",
+      opponent: ""
+    });
+  };
+
+  inviteDialog = (inviteViewHeight = null) => {
+    if (this.state.currentMode === "Online") {
+      return;
+    }
+
+    inviteViewHeight =
+      inviteViewHeight || this.state.inviteViewHeight === 80 ? 0 : 80;
+
+    LayoutAnimation.configureNext(LayoutAnimation.Presets.linear);
+    this.setState({ inviteViewHeight });
+  };
+
+  sendInvite = () => {
     let { opponent, userName } = this.state;
     if (opponent === "") {
       this.setState({ inviteStatus: "Enter username" });
@@ -104,9 +164,9 @@ class Board extends Component {
     }
 
     Socket.sendData("sendInvite", { from: this.state.userName, to: opponent });
-  }
+  };
 
-  updateFromServer(responseType, data) {
+  updateFromServer = (responseType, data) => {
     if (responseType === "inviteReceived") {
       Alert.alert("Invite received from " + data.from, "", [
         {
@@ -126,14 +186,15 @@ class Board extends Component {
       this.setState({ inviteStatus: data.message });
     } else if (responseType === "inviteResponse") {
       if (data.status === "accepted") {
-        this.inviteDialog("none");
+        this.reloadForOnlineGame();
         let { nextSymbol, symbolAssigned } = this.state;
         let infoLabel =
           nextSymbol === symbolAssigned ? "Your turn : " : "Opponent's turn : ";
+        split = data.roomId.split("-");
+        opponent = split[1] === this.state.userName ? split[2] : split[1];
         this.setState({
-          currentMode: "Online",
-          inviteStatus: "",
           roomId: data.roomId,
+          opponent,
           infoLabel
         });
       } else {
@@ -143,10 +204,13 @@ class Board extends Component {
       this.clicked(data.cellNo, true);
     } else if (responseType === "symbolAssigned") {
       this.setState({ symbolAssigned: data.symbol });
+    } else if (responseType === "leaveRoom") {
+      this.reload(true);
+      alert("Other player has left the game.");
     }
-  }
+  };
 
-  clicked(cellNo, byOpponent = false) {
+  clicked = (cellNo, byOpponent = false) => {
     let { symbols, nextSymbol, symbolAssigned, currentMode } = this.state;
     if (
       !this.state.gameEnd &&
@@ -207,9 +271,9 @@ class Board extends Component {
         })
       ]).start();
     }
-  }
+  };
 
-  gameEnd(result, iteration = null) {
+  gameEnd = (result, iteration = null) => {
     if (this.state.currentMode === "Online" && iteration) {
       result =
         this.state.nextSymbol === this.state.symbolAssigned
@@ -233,7 +297,7 @@ class Board extends Component {
           toValue: (this.state.viewH * (iteration * 2 + 1)) / 6,
           friction: 3
         }).start();
-        Animated.spring(this.state.hLineWidth, {
+        Animated.spring(this.state.hLineLength, {
           toValue: this.state.viewW,
           friction: 3
         }).start();
@@ -242,16 +306,16 @@ class Board extends Component {
           toValue: (this.state.viewW * (2 * iteration - 5)) / 6,
           friction: 3
         }).start();
-        Animated.spring(this.state.vLineHeight, {
+        Animated.spring(this.state.vLineLength, {
           toValue: this.state.viewH,
           friction: 3
         }).start();
       } else {
-        let height =
+        let length =
           iteration === 6
-            ? this.state.dLineOneHeight
-            : this.state.dLineTwoHeight;
-        Animated.spring(height, {
+            ? this.state.dLineOneLength
+            : this.state.dLineTwoLength;
+        Animated.spring(length, {
           toValue: this.state.viewW * 1.414,
           friction: 3
         }).start();
@@ -261,159 +325,76 @@ class Board extends Component {
         }).start();
       }
     }
-  }
+  };
 
-  setPosition(elem) {
+  setInitialPosition = elem => {
     this.setState({
       viewW: elem.width,
       viewH: elem.height,
       hLinePosition: new Animated.Value(elem.height / 2),
-      vLinePosition: new Animated.Value(elem.width / 2),
-      dLinePosition: new Animated.Value(elem.width / 2)
+      vLinePosition: new Animated.Value(elem.width / 2)
     });
-  }
+  };
 
   render() {
     let { symbolSize, infoSize, boardOpacity } = this.state;
     let {
       hLinePosition,
-      hLineWidth,
+      hLineLength,
       vLinePosition,
-      vLineHeight,
-      dLineOneHeight,
-      dLineTwoHeight,
-      dLinePosition,
+      vLineLength,
+      dLineOneLength,
+      dLineTwoLength,
       dLineAngle
     } = this.state;
 
-    let dLineOneAngle = dLineAngle.interpolate({
-      inputRange: [0, 45],
-      outputRange: ["0deg", "-45deg"]
-    });
-    let dLineTwoAngle = dLineAngle.interpolate({
+    dLineAngle = dLineAngle.interpolate({
       inputRange: [0, 45],
       outputRange: ["0deg", "45deg"]
     });
 
-    let board = [];
-    for (let i = 0; i <= 2; i++) {
-      board.push(
-        <Row
-          key={i}
-          id={i}
-          clicked={this.clicked}
-          symbolSize={symbolSize}
-          symbols={this.state.symbols}
-        />
-      );
-    }
-
     return (
       <View style={styles.container}>
         <Topbar
+          // key={this.state.gridKey}
           userName={this.state.userName}
           changeView={this.props.changeView}
           inviteDialog={this.inviteDialog}
           currentMode={this.state.currentMode}
+          opponent={this.state.opponent}
+          reload={this.reload}
+          leaveRoom={this.leaveRoom}
         />
 
-        <View
-          style={{
-            display: this.state.inviteView,
-            alignItems: "center",
-            alignSelf: "stretch"
+        <InviteSection
+          view={this.state.inviteViewHeight}
+          status={this.state.inviteStatus}
+          sendInvite={this.sendInvite}
+          setOpponent={value => {
+            this.setState({ opponent: value });
           }}
-        >
-          <View style={{ flexDirection: "row", alignItems: "center" }}>
-            <TextInput
-              style={{
-                margin: 10,
-                fontSize: 20,
-                padding: 10,
-                borderRadius: 10,
-                backgroundColor: "#eee",
-                flex: 1
-              }}
-              autoCorrect={false}
-              autoCapitalize="none"
-              placeholder="Enter Opponent Username"
-              placeholderTextColor="#999"
-              onChangeText={value => {
-                this.setState({ opponent: value });
-              }}
-            />
+        />
 
-            <TouchableOpacity
-              onPress={() => {
-                this.sendInvite();
-              }}
-            >
-              <Text style={{ paddingRight: 10, fontSize: 20, flex: -1 }}>
-                Invite
-              </Text>
-            </TouchableOpacity>
-          </View>
-          <View>
-            <Text> {this.state.inviteStatus} </Text>
-          </View>
-        </View>
+        <Grid
+          setInitialPosition={this.setInitialPosition}
+          boardOpacity={boardOpacity}
+          symbolSize={symbolSize}
+          symbols={this.state.symbols}
+          hLinePosition={hLinePosition}
+          hLineLength={hLineLength}
+          vLinePosition={vLinePosition}
+          vLineLength={vLineLength}
+          dLineOneLength={dLineOneLength}
+          dLineTwoLength={dLineTwoLength}
+          dLineAngle={dLineAngle}
+          clicked={this.clicked}
+        />
 
-        <Animated.View
-          onLayout={e => {
-            this.setPosition(e.nativeEvent.layout);
-          }}
-          style={[styles.board, { opacity: boardOpacity }]}
-        >
-          {board}
-          {/* Horizontal line */}
-          <Animated.View
-            style={[
-              { top: hLinePosition, height: 2, width: hLineWidth },
-              styles.line
-            ]}
-          />
-          {/* Vertical line */}
-          <Animated.View
-            style={[
-              { left: vLinePosition, height: vLineHeight, width: 2 },
-              styles.line
-            ]}
-          />
-          {/* Diagonal line 1 */}
-          <Animated.View
-            style={[
-              {
-                left: dLinePosition,
-                height: dLineOneHeight,
-                width: 2,
-                transform: [{ rotate: dLineOneAngle }]
-              },
-              styles.line
-            ]}
-          />
-          {/* Diagonal line 2 */}
-          <Animated.View
-            style={[
-              {
-                left: dLinePosition,
-                height: dLineTwoHeight,
-                width: 2,
-                transform: [{ rotate: dLineTwoAngle }]
-              },
-              styles.line
-            ]}
-          />
-        </Animated.View>
-
-        <View style={[styles.infoSection]}>
-          <View style={{ flexDirection: "row" }}>
-            <Text> {this.state.onlineGameInfo} </Text>
-            <Animated.Text style={[{ fontSize: infoSize }]}>
-              {this.state.infoLabel}
-            </Animated.Text>
-            <Text style={[{ fontSize: 25 }]}> {this.state.nextSymbol} </Text>
-          </View>
-        </View>
+        <InfoSection
+          infoSize={infoSize}
+          infoLabel={this.state.infoLabel}
+          nextSymbol={this.state.nextSymbol}
+        />
       </View>
     );
   }
